@@ -4,6 +4,7 @@ from api.v1.views import app_views
 from flask import jsonify, abort, request
 from models import storage
 from models.place import Place
+from models.user import User
 from models.review import Review
 
 
@@ -24,12 +25,12 @@ def review_from_id(review_id):
     review = storage.get(Review, review_id)
     if review is None:
         abort(404)
-    return jsonify(place.to_dict())
+    return jsonify(review.to_dict())
 
 
 @app_views.route('/reviews/<review_id>', methods=['DELETE'],
                  strict_slashes=False)
-def delete_review(place_id):
+def delete_review(review_id):
     """deletes a review object"""
     review = storage.get(Review, review_id)
     if review is None:
@@ -39,8 +40,9 @@ def delete_review(place_id):
     return jsonify({})
 
 
-@app_views.route('/places/<place_id>/reviews', methods=['POST'], strict_slashes=False)
-def create_review():
+@app_views.route('/places/<place_id>/reviews', methods=['POST'],
+                 strict_slashes=False)
+def create_review(place_id):
     """creates a review object"""
     data = request.get_json()
     place = storage.get(Place, place_id)
@@ -50,13 +52,12 @@ def create_review():
         abort(400, 'Not a JSON')
     if 'user_id' not in data:
         abort(400, 'Missing user_id')
-    user = storage.get(User, user_id)
+    user = storage.get(User, data['user_id'])
     if user is None:
         abort(404)
-    if 'name' not in data:
-        abort(400, 'Missing name')
     if 'text' not in data:
         abort(400, 'Missing text')
+    data['place_id'] = place_id
     new_review = Review(**data)
     storage.new(new_review)
     storage.save()

@@ -1,4 +1,4 @@
-#!/usr/bin/pthon3
+#!/usr/bin/python3
 """handles RESTfulAPI actions
 related to amenities"""
 from api.v1.views import app_views
