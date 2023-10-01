@@ -69,7 +69,7 @@ def update_city(city_id):
     if data is None:
         abort(400, 'Not a JSON')
     for k, v in data.items():
-        if k not in ['id', 'created_at', 'updated_at']:
+        if k not in ['id', 'state_id', 'created_at', 'updated_at']:
             setattr(city, k, v)
     storage.save()
     return jsonify(city.to_dict()), 200
